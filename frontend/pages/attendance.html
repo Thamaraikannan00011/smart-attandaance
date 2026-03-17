@@ -138,15 +138,48 @@
 import { registerSW, initOfflineBanner, queueAttendance, triggerSync } from '../js/pwa.js';
 registerSW(); initOfflineBanner();
 import { today, formatDateLong, nowDisplay } from '../js/utils/date.js';
-import { MOCK_STUDENTS } from '../js/utils/mock.js';
 import { toastSuccess, toastError } from '../js/components/toast.js';
+import { listStudents, listAttendanceByDate, markAttendance } from '../js/api.js';
 
 document.getElementById('dateSelect').value = today();
 document.getElementById('topbarDate').textContent = nowDisplay();
 document.getElementById('pageSubtitle').textContent = formatDateLong(today());
 
 let attendance = {};
-let students = [...MOCK_STUDENTS];
+let students = [];
+
+function uiToApiStatus(uiStatus) {
+  if (uiStatus === 'Present') return 'PRESENT';
+  if (uiStatus === 'Late') return 'LATE';
+  return 'ABSENT';
+}
+
+async function loadStudentsAndExisting(dateStr) {
+  try {
+    const apiStudents = await listStudents();
+    students = apiStudents.map((s) => ({ id: s.id, name: s.fullName, rollNo: s.rollNo, photo: '' }));
+
+    // preload existing attendance for that date (best-effort)
+    attendance = {};
+    const rows = await listAttendanceByDate(dateStr);
+    rows.forEach((r) => {
+      const stu = students.find((s) => s.rollNo === r.studentRollNo);
+      if (!stu) return;
+      const ui =
+        r.status === 'PRESENT' ? 'Present' :
+        r.status === 'LATE' ? 'Late' :
+        r.status === 'ABSENT' ? 'Absent' : '';
+      if (ui) attendance[stu.id] = ui;
+    });
+
+    renderList(document.getElementById('searchInput').value);
+  } catch (e) {
+    toastError(e?.message || 'Failed to load students.');
+    students = [];
+    attendance = {};
+    renderList();
+  }
+}
 
 function renderList(q = '') {
   const list = q ? students.filter(s =>
@@ -245,10 +278,21 @@ document.getElementById('btnClear').addEventListener('click', () => {
 document.getElementById('btnSave').addEventListener('click', async () => {
   const marked = Object.keys(attendance).length;
   if (marked < students.length) { toastError(`Please mark all ${students.length} students first.`); return; }
-  const payload = students.map(s => ({ studentId: s.id, date: document.getElementById('dateSelect').value, period: +document.getElementById('periodSelect').value, status: attendance[s.id] }));
+  const dateStr = document.getElementById('dateSelect').value;
+  const periodId = Number(document.getElementById('periodSelect').value) || null;
+  const payload = students.map(s => ({
+    date: dateStr,
+    studentRollNo: s.rollNo,
+    status: uiToApiStatus(attendance[s.id]),
+    periodId,
+  }));
   if (navigator.onLine) {
-    console.log('Saving:', payload);
-    toastSuccess('Attendance saved successfully!');
+    try {
+      await Promise.all(payload.map((p) => markAttendance(p)));
+      toastSuccess('Attendance saved successfully!');
+    } catch (e) {
+      toastError(e?.message || 'Failed to save attendance.');
+    }
   } else {
     await queueAttendance(payload); await triggerSync();
     toastSuccess('Saved offline — syncs when reconnected.');
@@ -256,7 +300,9 @@ document.getElementById('btnSave').addEventListener('click', async () => {
 });
 document.getElementById('searchInput').addEventListener('input', e => renderList(e.target.value));
 document.getElementById('dateSelect').addEventListener('change', () => {
-  document.getElementById('pageSubtitle').textContent = formatDateLong(document.getElementById('dateSelect').value);
+  const d = document.getElementById('dateSelect').value;
+  document.getElementById('pageSubtitle').textContent = formatDateLong(d);
+  loadStudentsAndExisting(d);
 });
 document.getElementById('menuToggle').addEventListener('click', () => {
   document.getElementById('sidebar').classList.toggle('open');
@@ -267,7 +313,7 @@ document.getElementById('sidebarOverlay').addEventListener('click', () => {
   document.getElementById('sidebarOverlay').classList.remove('show');
 });
 
-renderList();
+loadStudentsAndExisting(today());
 </script>
 </body>
 </html>

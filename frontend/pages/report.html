@@ -133,8 +133,8 @@
 import { registerSW, initOfflineBanner } from '../js/pwa.js';
 registerSW(); initOfflineBanner();
 import { today, formatDate } from '../js/utils/date.js';
-import { MOCK_STUDENTS } from '../js/utils/mock.js';
 import { toastSuccess, toastInfo } from '../js/components/toast.js';
+import { listStudents, reportRecords } from '../js/api.js';
 
 // Init dates
 const toDateEl = document.getElementById('toDate');
@@ -143,35 +143,56 @@ toDateEl.value = today();
 const d = new Date(); d.setDate(d.getDate()-13);
 fromDateEl.value = d.toISOString().split('T')[0];
 
-MOCK_STUDENTS.forEach(s => {
-  const o = document.createElement('option');
-  o.value = s.id; o.textContent = `${s.name} (${s.rollNo})`;
-  document.getElementById('filterStudent').appendChild(o);
-});
+let studentOptions = [];
 
-function generateMockRecords(from, to) {
-  const records = [], statuses = ['Present','Present','Present','Absent','Late','Present'];
-  const start = new Date(from), end = new Date(to);
-  for (let dt = new Date(start); dt <= end; dt.setDate(dt.getDate()+1)) {
-    if (dt.getDay()===0) continue;
-    const dateStr = dt.toISOString().split('T')[0];
-    MOCK_STUDENTS.forEach((s,i) => records.push({ studentId:s.id, studentName:s.name, rollNo:s.rollNo, date:dateStr, status: statuses[(i+dt.getDate())%statuses.length] }));
+async function loadStudents() {
+  const sel = document.getElementById('filterStudent');
+  // keep first option
+  sel.querySelectorAll('option:not(:first-child)').forEach((o) => o.remove());
+  try {
+    const apiStudents = await listStudents();
+    studentOptions = apiStudents.map((s) => ({ rollNo: s.rollNo, name: s.fullName }));
+    studentOptions.forEach((s) => {
+      const o = document.createElement('option');
+      o.value = s.rollNo;
+      o.textContent = `${s.name} (${s.rollNo})`;
+      sel.appendChild(o);
+    });
+  } catch (e) {
+    studentOptions = [];
+    toastInfo('Could not load students list.');
   }
-  return records;
 }
 
 let allRecords = [];
 
-function runReport() {
+async function runReport() {
   const from   = fromDateEl.value;
   const to     = toDateEl.value;
-  const stuId  = document.getElementById('filterStudent').value;
+  const rollNo  = document.getElementById('filterStudent').value;
   const status = document.getElementById('filterStatus').value;
 
-  allRecords = generateMockRecords(from, to);
-  let filtered = allRecords;
-  if (stuId)  filtered = filtered.filter(r => r.studentId == stuId);
-  if (status) filtered = filtered.filter(r => r.status === status);
+  const apiStatus =
+    status === 'Present' ? 'PRESENT' :
+    status === 'Late' ? 'LATE' :
+    status === 'Absent' ? 'ABSENT' : '';
+
+  const rows = await reportRecords({
+    from,
+    to,
+    studentRollNo: rollNo || '',
+    status: apiStatus || '',
+  });
+
+  // normalize to existing UI format
+  allRecords = rows.map((r) => ({
+    studentName: r.studentName,
+    rollNo: r.studentRollNo,
+    date: r.date,
+    status: r.status === 'PRESENT' ? 'Present' : r.status === 'LATE' ? 'Late' : 'Absent',
+  }));
+
+  const filtered = allRecords;
 
   const present = filtered.filter(r => r.status==='Present').length;
   const absent  = filtered.filter(r => r.status==='Absent').length;
@@ -188,12 +209,9 @@ function runReport() {
   ].map(s => `<div class="stat-card"><div class="stat-label">${s.label}</div><div class="stat-value">${s.value}</div><div class="stat-bar"><div class="stat-bar-fill" style="width:0%" data-w="${s.bar}"></div></div></div>`).join('');
   setTimeout(() => document.querySelectorAll('.stat-bar-fill').forEach(el => el.style.width = el.dataset.w+'%'), 80);
 
-  const low = MOCK_STUDENTS.filter(s => s.percentage < 75);
+  const low = [];
   const alertEl = document.getElementById('lowAttendanceAlert');
-  if (low.length) {
-    alertEl.style.display = 'flex';
-    alertEl.innerHTML = `<svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="flex-shrink:0"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg><span><strong>${low.length} student${low.length>1?'s':''} below 75%:</strong> ${low.map(s=>s.name).join(', ')}</span>`;
-  } else { alertEl.style.display = 'none'; }
+  alertEl.style.display = 'none';
 
   document.getElementById('recordsTabCount').textContent = filtered.length ? `(${filtered.length})` : '';
   if (!filtered.length) {
@@ -214,13 +232,13 @@ function runReport() {
 
   // Per-student
   const byStudent = {};
-  MOCK_STUDENTS.forEach(s => { byStudent[s.id] = { ...s, present:0, absent:0, late:0, total:0 }; });
-  allRecords.forEach(r => {
-    if (!byStudent[r.studentId]) return;
-    byStudent[r.studentId].total++;
-    if (r.status==='Present') byStudent[r.studentId].present++;
-    else if (r.status==='Absent') byStudent[r.studentId].absent++;
-    else if (r.status==='Late') byStudent[r.studentId].late++;
+  allRecords.forEach((r) => {
+    const key = r.rollNo || r.studentName;
+    if (!byStudent[key]) byStudent[key] = { name: r.studentName, rollNo: r.rollNo, photo: '', present: 0, absent: 0, late: 0, total: 0 };
+    byStudent[key].total++;
+    if (r.status === 'Present') byStudent[key].present++;
+    else if (r.status === 'Absent') byStudent[key].absent++;
+    else if (r.status === 'Late') byStudent[key].late++;
   });
   document.getElementById('perStudentSummary').innerHTML = `
     <table class="data-table">
@@ -228,7 +246,6 @@ function runReport() {
       <tbody>${Object.values(byStudent).map(s => {
         const pct = s.total ? Math.round((s.present+s.late)*100/s.total) : 0;
         const pctColor = pct >= 75 ? 'var(--black)' : 'var(--gray-400)';
-        const status = pct >= 75 ? 'badge-present' : 'badge-absent';
         return `<tr>
           <td><div class="student-cell">
             <img class="avatar" src="${s.photo}" alt="${s.name}" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
@@ -251,7 +268,14 @@ function runReport() {
     </table>`;
 }
 
-document.getElementById('btnGenerate').addEventListener('click', () => { runReport(); toastSuccess('Report generated.'); });
+document.getElementById('btnGenerate').addEventListener('click', async () => {
+  try {
+    await runReport();
+    toastSuccess('Report generated.');
+  } catch (e) {
+    toastInfo(e?.message || 'Failed to generate report.');
+  }
+});
 document.getElementById('btnExportCSV').addEventListener('click', () => {
   if (!allRecords.length) { toastInfo('Generate a report first.'); return; }
   const rows = [['Student','Roll No','Date','Status'], ...allRecords.map(r => [r.studentName,r.rollNo,r.date,r.status])];
@@ -274,7 +298,7 @@ document.querySelectorAll('.tab-btn').forEach(btn => {
 document.getElementById('menuToggle').addEventListener('click', () => { document.getElementById('sidebar').classList.toggle('open'); document.getElementById('sidebarOverlay').classList.toggle('show'); });
 document.getElementById('sidebarOverlay').addEventListener('click', () => { document.getElementById('sidebar').classList.remove('open'); document.getElementById('sidebarOverlay').classList.remove('show'); });
 
-runReport();
+loadStudents().then(() => runReport());
 </script>
 </body>
 </html>
