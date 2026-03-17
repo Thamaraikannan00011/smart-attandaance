@@ -7,8 +7,8 @@ services:
       POSTGRES_PASSWORD: smartattendance
     volumes:
       - smartattendance_db:/var/lib/postgresql/data
-    ports:
-      - "5432:5432"
+    networks:
+      - internal
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U smartattendance -d smartattendance"]
       interval: 5s
