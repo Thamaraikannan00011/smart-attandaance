@@ -3,6 +3,7 @@ package com.example.smartattendance.service.impl;
 import com.example.smartattendance.dto.request.StudentRequest;
 import com.example.smartattendance.dto.response.StudentDTO;
 import com.example.smartattendance.entity.Student;
+import com.example.smartattendance.exception.ResourceNotFoundException;
 import com.example.smartattendance.mapper.StudentMapper;
 import com.example.smartattendance.repository.StudentRepository;
 import com.example.smartattendance.service.StudentService;
@@ -32,6 +33,24 @@ public class StudentServiceImpl implements StudentService {
     s.setRollNo(req.rollNo());
     s.setFullName(req.fullName());
     return mapper.toDto(repo.save(s));
+  }
+
+  @Override
+  @Transactional
+  public StudentDTO update(long id, StudentRequest req) {
+    Student s = repo.findById(id).orElseThrow(() -> new ResourceNotFoundException("Student not found: " + id));
+    s.setRollNo(req.rollNo());
+    s.setFullName(req.fullName());
+    return mapper.toDto(repo.save(s));
+  }
+
+  @Override
+  @Transactional
+  public void delete(long id) {
+    if (!repo.existsById(id)) {
+      throw new ResourceNotFoundException("Student not found: " + id);
+    }
+    repo.deleteById(id);
   }
 }
 

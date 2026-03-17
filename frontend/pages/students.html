@@ -159,14 +159,35 @@
 <script type="module">
 import { registerSW, initOfflineBanner } from '../js/pwa.js';
 registerSW(); initOfflineBanner();
-import { MOCK_STUDENTS } from '../js/utils/mock.js';
 import { openModal, closeModal, initModals } from '../js/components/modal.js';
 import { toastSuccess, toastError } from '../js/components/toast.js';
+import { listStudents, createStudent, updateStudent, deleteStudent } from '../js/api.js';
 
 initModals();
-let students = [...MOCK_STUDENTS];
+let students = [];
 let deleteId = null;
 let sortCol = 'name', sortDir = 1;
+
+async function loadStudents() {
+  try {
+    const apiStudents = await listStudents();
+    // Normalize backend DTO -> UI shape
+    students = apiStudents.map((s) => ({
+      id: s.id,
+      name: s.fullName,
+      rollNo: s.rollNo,
+      email: '',
+      phone: '',
+      photo: '',
+      percentage: 0,
+    }));
+    renderAll(document.getElementById('searchInput').value);
+  } catch (e) {
+    toastError(e?.message || 'Failed to load students.');
+    students = [];
+    renderAll();
+  }
+}
 
 function getFiltered(q = '') {
   const l = q.toLowerCase();
@@ -281,26 +302,51 @@ document.getElementById('btnSaveStudent').addEventListener('click', () => {
   errEl.style.display='none';
   const id=document.getElementById('editId').value;
   if (id) {
-    const idx=students.findIndex(s=>s.id==id);
-    if (idx>-1) Object.assign(students[idx],{name,rollNo:roll,email:document.getElementById('fieldEmail').value.trim(),phone:document.getElementById('fieldPhone').value.trim()});
-    toastSuccess('Student updated.');
+    (async () => {
+      try {
+        await updateStudent(id, { rollNo: roll, fullName: name });
+        toastSuccess('Student updated.');
+        closeModal('modalStudent');
+        await loadStudents();
+      } catch (e) {
+        toastError(e?.message || 'Failed to update student.');
+      }
+    })();
+    return;
   } else {
-    students.push({id:Date.now(),name,rollNo:roll,email:document.getElementById('fieldEmail').value.trim(),phone:document.getElementById('fieldPhone').value.trim(),photo:'',percentage:0});
-    toastSuccess('Student added.');
+    (async () => {
+      try {
+        await createStudent({ rollNo: roll, fullName: name });
+        toastSuccess('Student added.');
+        closeModal('modalStudent');
+        await loadStudents();
+      } catch (e) {
+        toastError(e?.message || 'Failed to add student.');
+      }
+    })();
+    return;
   }
-  closeModal('modalStudent'); renderAll();
 });
 
 window.confirmDelete = (id,name) => { deleteId=id; document.getElementById('deleteStudentName').textContent=name; openModal('modalDelete'); };
 document.getElementById('btnConfirmDelete').addEventListener('click', () => {
-  students=students.filter(s=>s.id!==deleteId);
-  closeModal('modalDelete'); toastSuccess('Student removed.'); renderAll();
+  (async () => {
+    try {
+      await deleteStudent(deleteId);
+      closeModal('modalDelete');
+      toastSuccess('Student removed.');
+      await loadStudents();
+    } catch (e) {
+      toastError(e?.message || 'Failed to remove student.');
+    }
+  })();
 });
 
 document.getElementById('menuToggle').addEventListener('click', () => { document.getElementById('sidebar').classList.toggle('open'); document.getElementById('sidebarOverlay').classList.toggle('show'); });
 document.getElementById('sidebarOverlay').addEventListener('click', () => { document.getElementById('sidebar').classList.remove('open'); document.getElementById('sidebarOverlay').classList.remove('show'); });
 
 renderAll();
+loadStudents();
 </script>
 </body>
 </html>

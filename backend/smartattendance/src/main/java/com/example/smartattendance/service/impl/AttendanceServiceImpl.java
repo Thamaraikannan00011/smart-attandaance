@@ -59,11 +59,13 @@ public class AttendanceServiceImpl implements AttendanceService {
   }
 
   @Override
+  @Transactional(readOnly = true)
   public List<AttendanceDTO> listByDate(LocalDate date) {
     return attendanceRepo.findAllByAttendanceDate(date).stream().map(mapper::toDto).toList();
   }
 
   @Override
+  @Transactional(readOnly = true)
   public DailySummaryDTO summary(LocalDate date) {
     long total = studentRepo.count();
     List<Attendance> rows = attendanceRepo.findAllByAttendanceDate(date);

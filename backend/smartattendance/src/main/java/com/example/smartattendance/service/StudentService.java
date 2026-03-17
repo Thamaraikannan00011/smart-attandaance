@@ -8,5 +8,9 @@ public interface StudentService {
   List<StudentDTO> list();
 
   StudentDTO create(StudentRequest req);
+
+  StudentDTO update(long id, StudentRequest req);
+
+  void delete(long id);
 }
 
