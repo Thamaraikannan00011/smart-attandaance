@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>SmartAttend — Reports</title>
+  <link rel="manifest" href="../manifest.json"/>
+  <meta name="theme-color" content="#0c0c0c"/>
+  <meta name="apple-mobile-web-app-capable" content="yes"/>
+  <meta name="apple-mobile-web-app-title" content="SmartAttend"/>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Geist:wght@300;400;500;600&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/tokens.css"/>
+  <link rel="stylesheet" href="../css/reset.css"/>
+  <link rel="stylesheet" href="../css/layout.css"/>
+  <link rel="stylesheet" href="../css/components.css"/>
+  <style>
+  @media print {
+    .sidebar,.topbar,.page-header-actions,.topbar-right { display:none!important; }
+    .main-wrap { margin-left:0!important; }
+    .page-content { padding:0!important; }
+    .card { box-shadow:none!important; border:1px solid #ddd!important; }
+  }
+  </style>
+</head>
+<body>
+<div class="app-layout">
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-logo">
+      <div class="logo-mark">
+        <div class="logo-icon"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg></div>
+        <span class="logo-text">SmartAttend</span>
+      </div>
+      <div class="logo-sub">Attendance Management</div>
+    </div>
+    <nav class="sidebar-nav">
+      <div class="nav-section-label">Navigation</div>
+      <a href="../index.html" class="nav-link"><svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>Dashboard</a>
+      <a href="attendance.html" class="nav-link"><svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>Mark Attendance</a>
+      <a href="students.html" class="nav-link"><svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>Students</a>
+      <a href="report.html" class="nav-link active"><svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14,2 14,8 20,8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>Reports</a>
+    </nav>
+    <div class="sidebar-footer"><span class="version">v1.0.0</span><span class="status-dot online"></span></div>
+  </aside>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+  <div class="main-wrap">
+    <header class="topbar">
+      <div class="topbar-left">
+        <button class="menu-toggle" id="menuToggle"><svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg></button>
+        <div class="topbar-breadcrumb"><span>SmartAttend</span><span class="sep">/</span><span class="current">Reports</span></div>
+      </div>
+      <div class="topbar-right">
+        <button class="btn btn-secondary btn-sm" id="btnExportCSV">
+          <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          CSV
+        </button>
+        <button class="btn btn-secondary btn-sm" id="btnPrint">
+          <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+          Print
+        </button>
+      </div>
+    </header>
+
+    <main class="page-content">
+      <div class="page-header">
+        <div>
+          <h1 class="page-header-title">Attendance Reports</h1>
+          <p class="page-header-sub">Analyse attendance data across any date range</p>
+        </div>
+      </div>
+
+      <!-- Filter bar -->
+      <div class="card card-sm mb-6" style="display:flex;align-items:flex-end;gap:14px;flex-wrap:wrap;">
+        <div class="form-group">
+          <label class="form-label">From</label>
+          <input type="date" class="form-input" id="fromDate" style="width:150px;"/>
+        </div>
+        <div class="form-group">
+          <label class="form-label">To</label>
+          <input type="date" class="form-input" id="toDate" style="width:150px;"/>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Student</label>
+          <select class="form-select" id="filterStudent" style="width:190px;">
+            <option value="">All Students</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Status</label>
+          <select class="form-select" id="filterStatus" style="width:130px;">
+            <option value="">All</option>
+            <option>Present</option>
+            <option>Absent</option>
+            <option>Late</option>
+          </select>
+        </div>
+        <button class="btn btn-primary" id="btnGenerate" style="margin-bottom:1px;">
+          <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          Generate
+        </button>
+      </div>
+
+      <!-- Stats row -->
+      <div class="stat-grid" id="reportStats" style="grid-template-columns:repeat(5,1fr);margin-bottom:20px;"></div>
+
+      <!-- Low attendance alert -->
+      <div id="lowAttendanceAlert" class="alert alert-warning" style="display:none;"></div>
+
+      <!-- Tabs: Records | Per Student -->
+      <div class="tabs">
+        <button class="tab-btn active" data-tab="records">Records <span id="recordsTabCount" style="color:var(--gray-300);font-size:11px;font-family:var(--font-mono);"></span></button>
+        <button class="tab-btn" data-tab="summary">Per-Student Summary</button>
+      </div>
+
+      <div class="tab-panel active" id="tab-records">
+        <div class="card card-flush">
+          <div id="reportTableWrap"></div>
+        </div>
+      </div>
+
+      <div class="tab-panel" id="tab-summary">
+        <div class="card card-flush">
+          <div id="perStudentSummary"></div>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+
+<script type="module">
+import { registerSW, initOfflineBanner } from '../js/pwa.js';
+registerSW(); initOfflineBanner();
+import { today, formatDate } from '../js/utils/date.js';
+import { MOCK_STUDENTS } from '../js/utils/mock.js';
+import { toastSuccess, toastInfo } from '../js/components/toast.js';
+
+// Init dates
+const toDateEl = document.getElementById('toDate');
+const fromDateEl = document.getElementById('fromDate');
+toDateEl.value = today();
+const d = new Date(); d.setDate(d.getDate()-13);
+fromDateEl.value = d.toISOString().split('T')[0];
+
+MOCK_STUDENTS.forEach(s => {
+  const o = document.createElement('option');
+  o.value = s.id; o.textContent = `${s.name} (${s.rollNo})`;
+  document.getElementById('filterStudent').appendChild(o);
+});
+
+function generateMockRecords(from, to) {
+  const records = [], statuses = ['Present','Present','Present','Absent','Late','Present'];
+  const start = new Date(from), end = new Date(to);
+  for (let dt = new Date(start); dt <= end; dt.setDate(dt.getDate()+1)) {
+    if (dt.getDay()===0) continue;
+    const dateStr = dt.toISOString().split('T')[0];
+    MOCK_STUDENTS.forEach((s,i) => records.push({ studentId:s.id, studentName:s.name, rollNo:s.rollNo, date:dateStr, status: statuses[(i+dt.getDate())%statuses.length] }));
+  }
+  return records;
+}
+
+let allRecords = [];
+
+function runReport() {
+  const from   = fromDateEl.value;
+  const to     = toDateEl.value;
+  const stuId  = document.getElementById('filterStudent').value;
+  const status = document.getElementById('filterStatus').value;
+
+  allRecords = generateMockRecords(from, to);
+  let filtered = allRecords;
+  if (stuId)  filtered = filtered.filter(r => r.studentId == stuId);
+  if (status) filtered = filtered.filter(r => r.status === status);
+
+  const present = filtered.filter(r => r.status==='Present').length;
+  const absent  = filtered.filter(r => r.status==='Absent').length;
+  const late    = filtered.filter(r => r.status==='Late').length;
+  const total   = filtered.length;
+  const pct     = total ? Math.round((present+late)*100/total) : 0;
+
+  document.getElementById('reportStats').innerHTML = [
+    { label:'Total Records', value:total, bar:100 },
+    { label:'Present',       value:present, bar:total?present/total*100:0 },
+    { label:'Absent',        value:absent,  bar:total?absent/total*100:0  },
+    { label:'Late',          value:late,    bar:total?late/total*100:0    },
+    { label:'Attendance %',  value:pct+'%', bar:pct },
+  ].map(s => `<div class="stat-card"><div class="stat-label">${s.label}</div><div class="stat-value">${s.value}</div><div class="stat-bar"><div class="stat-bar-fill" style="width:0%" data-w="${s.bar}"></div></div></div>`).join('');
+  setTimeout(() => document.querySelectorAll('.stat-bar-fill').forEach(el => el.style.width = el.dataset.w+'%'), 80);
+
+  const low = MOCK_STUDENTS.filter(s => s.percentage < 75);
+  const alertEl = document.getElementById('lowAttendanceAlert');
+  if (low.length) {
+    alertEl.style.display = 'flex';
+    alertEl.innerHTML = `<svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="flex-shrink:0"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg><span><strong>${low.length} student${low.length>1?'s':''} below 75%:</strong> ${low.map(s=>s.name).join(', ')}</span>`;
+  } else { alertEl.style.display = 'none'; }
+
+  document.getElementById('recordsTabCount').textContent = filtered.length ? `(${filtered.length})` : '';
+  if (!filtered.length) {
+    document.getElementById('reportTableWrap').innerHTML = `<div class="empty-state"><svg width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24" style="color:var(--gray-200)"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14,2 14,8 20,8"/></svg><p class="empty-title">No records match your filters</p><p class="empty-sub">Try adjusting the date range or filters</p></div>`;
+  } else {
+    document.getElementById('reportTableWrap').innerHTML = `
+      <table class="data-table">
+        <thead><tr><th>Student</th><th>Roll No.</th><th>Date</th><th>Status</th></tr></thead>
+        <tbody>${filtered.slice(0,200).map(r => `<tr>
+          <td class="td-bold">${r.studentName}</td>
+          <td class="font-mono text-sm text-muted">${r.rollNo}</td>
+          <td class="text-sm text-muted">${formatDate(r.date)}</td>
+          <td><span class="badge badge-${r.status.toLowerCase()}">${r.status}</span></td>
+        </tr>`).join('')}</tbody>
+      </table>
+      ${filtered.length>200?`<div style="padding:12px 16px;font-size:12px;color:var(--gray-400);border-top:1px solid var(--gray-100);">Showing first 200 of ${filtered.length}. Export CSV for full data.</div>`:''}`;
+  }
+
+  // Per-student
+  const byStudent = {};
+  MOCK_STUDENTS.forEach(s => { byStudent[s.id] = { ...s, present:0, absent:0, late:0, total:0 }; });
+  allRecords.forEach(r => {
+    if (!byStudent[r.studentId]) return;
+    byStudent[r.studentId].total++;
+    if (r.status==='Present') byStudent[r.studentId].present++;
+    else if (r.status==='Absent') byStudent[r.studentId].absent++;
+    else if (r.status==='Late') byStudent[r.studentId].late++;
+  });
+  document.getElementById('perStudentSummary').innerHTML = `
+    <table class="data-table">
+      <thead><tr><th>Student</th><th>Roll No.</th><th>Present</th><th>Absent</th><th>Late</th><th>Days</th><th>Attendance</th></tr></thead>
+      <tbody>${Object.values(byStudent).map(s => {
+        const pct = s.total ? Math.round((s.present+s.late)*100/s.total) : 0;
+        const pctColor = pct >= 75 ? 'var(--black)' : 'var(--gray-400)';
+        const status = pct >= 75 ? 'badge-present' : 'badge-absent';
+        return `<tr>
+          <td><div class="student-cell">
+            <img class="avatar" src="${s.photo}" alt="${s.name}" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+            <div class="avatar" style="display:none">${s.name[0]}</div>
+            <div class="student-name">${s.name}</div>
+          </div></td>
+          <td class="font-mono text-sm text-muted">${s.rollNo}</td>
+          <td class="text-sm font-medium">${s.present}</td>
+          <td class="text-sm text-muted">${s.absent}</td>
+          <td class="text-sm text-muted">${s.late}</td>
+          <td class="text-sm text-muted">${s.total}</td>
+          <td>
+            <div class="flex items-center gap-2">
+              <div class="progress-wrap" style="width:60px;"><div class="progress-fill" style="width:${pct}%"></div></div>
+              <span class="font-mono text-xs" style="color:${pctColor};font-weight:600;">${pct}%</span>
+            </div>
+          </td>
+        </tr>`;}).join('')}
+      </tbody>
+    </table>`;
+}
+
+document.getElementById('btnGenerate').addEventListener('click', () => { runReport(); toastSuccess('Report generated.'); });
+document.getElementById('btnExportCSV').addEventListener('click', () => {
+  if (!allRecords.length) { toastInfo('Generate a report first.'); return; }
+  const rows = [['Student','Roll No','Date','Status'], ...allRecords.map(r => [r.studentName,r.rollNo,r.date,r.status])];
+  const a = document.createElement('a');
+  a.href = 'data:text/csv;charset=utf-8,'+encodeURIComponent(rows.map(r=>r.join(',')).join('\n'));
+  a.download = `attendance_${today()}.csv`; a.click();
+  toastSuccess('CSV exported.');
+});
+document.getElementById('btnPrint').addEventListener('click', () => window.print());
+
+document.querySelectorAll('.tab-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById('tab-'+btn.dataset.tab).classList.add('active');
+  });
+});
+
+document.getElementById('menuToggle').addEventListener('click', () => { document.getElementById('sidebar').classList.toggle('open'); document.getElementById('sidebarOverlay').classList.toggle('show'); });
+document.getElementById('sidebarOverlay').addEventListener('click', () => { document.getElementById('sidebar').classList.remove('open'); document.getElementById('sidebarOverlay').classList.remove('show'); });
+
+runReport();
+</script>
+</body>
+</html>

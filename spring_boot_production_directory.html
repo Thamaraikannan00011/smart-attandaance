@@ -1,0 +1,109 @@
+
+<style>
+  body { font-family: var(--font-mono); font-size: 13px; color: var(--color-text-primary); padding: 16px 0; }
+  .tree { line-height: 1.7; white-space: pre; overflow-x: auto; }
+  .dir  { color: var(--color-text-info); font-weight: 500; }
+  .file { color: var(--color-text-primary); }
+  .note { color: var(--color-text-tertiary); font-size: 11px; }
+  .section { margin: 12px 0 4px; font-size: 11px; font-weight: 500; color: var(--color-text-secondary); letter-spacing: .06em; text-transform: uppercase; }
+  .tag {
+    display: inline-block;
+    font-size: 10px;
+    font-weight: 500;
+    padding: 1px 6px;
+    border-radius: 4px;
+    margin-left: 6px;
+    vertical-align: middle;
+    font-family: var(--font-sans);
+  }
+  .tag-new    { background: var(--color-background-success); color: var(--color-text-success); }
+  .tag-move   { background: var(--color-background-warning); color: var(--color-text-warning); }
+  .tag-remove { background: var(--color-background-danger);  color: var(--color-text-danger);  }
+</style>
+
+<div class="section">Legend</div>
+<div style="font-family:var(--font-sans);font-size:12px;color:var(--color-text-secondary);margin-bottom:12px;display:flex;gap:10px;flex-wrap:wrap;">
+  <span><span class="tag tag-new">new</span> Add this</span>
+  <span><span class="tag tag-move">move</span> Reorganise</span>
+  <span><span class="tag tag-remove">remove</span> Drop this</span>
+</div>
+
+<div class="tree"><span class="dir">smartattendance/</span>
+├── <span class="dir">src/main/java/com/example/smartattendance/</span>
+│   │
+│   ├── <span class="dir">config/</span>                          <span class="tag tag-new">new</span>
+│   │   ├── <span class="file">SecurityConfig.java</span>          <span class="note">CORS, auth, method security</span>
+│   │   ├── <span class="file">WebMvcConfig.java</span>            <span class="note">static resources, interceptors</span>
+│   │   └── <span class="file">OpenApiConfig.java</span>           <span class="note">Swagger / SpringDoc setup</span>
+│   │
+│   ├── <span class="dir">controller/</span>                       <span class="tag tag-move">move</span>
+│   │   ├── <span class="file">AttendanceController.java</span>
+│   │   ├── <span class="file">StudentController.java</span>
+│   │   └── <span class="file">ReportController.java</span>         <span class="tag tag-new">new</span>
+│   │
+│   ├── <span class="dir">dto/</span>                               <span class="tag tag-move">move</span>
+│   │   ├── <span class="dir">request/</span>                        <span class="tag tag-new">new</span>
+│   │   │   ├── <span class="file">AttendanceRequest.java</span>      <span class="tag tag-move">move</span>  <span class="note">was in controller/</span>
+│   │   │   └── <span class="file">StudentRequest.java</span>
+│   │   └── <span class="dir">response/</span>                       <span class="tag tag-new">new</span>
+│   │       ├── <span class="file">AttendanceDTO.java</span>
+│   │       ├── <span class="file">DailySummaryDTO.java</span>
+│   │       └── <span class="file">ApiResponse.java</span>            <span class="tag tag-new">new</span>  <span class="note">generic envelope</span>
+│   │
+│   ├── <span class="dir">entity/</span>
+│   │   ├── <span class="file">Attendance.java</span>
+│   │   ├── <span class="file">AttendanceStatus.java</span>
+│   │   ├── <span class="file">Period.java</span>
+│   │   └── <span class="file">Student.java</span>
+│   │
+│   ├── <span class="dir">exception/</span>                        <span class="tag tag-new">new</span>
+│   │   ├── <span class="file">GlobalExceptionHandler.java</span>  <span class="note">@ControllerAdvice</span>
+│   │   ├── <span class="file">ResourceNotFoundException.java</span>
+│   │   └── <span class="file">BusinessException.java</span>
+│   │
+│   ├── <span class="dir">mapper/</span>                           <span class="tag tag-new">new</span>
+│   │   ├── <span class="file">AttendanceMapper.java</span>         <span class="note">entity ↔ DTO (MapStruct)</span>
+│   │   └── <span class="file">StudentMapper.java</span>
+│   │
+│   ├── <span class="dir">repository/</span>
+│   │   ├── <span class="file">AttendanceRepository.java</span>
+│   │   ├── <span class="file">PeriodRepository.java</span>
+│   │   └── <span class="file">StudentRepository.java</span>
+│   │
+│   ├── <span class="dir">service/</span>
+│   │   ├── <span class="file">AttendanceService.java</span>        <span class="note">interface</span>
+│   │   ├── <span class="file">StudentService.java</span>           <span class="note">interface</span>
+│   │   └── <span class="dir">impl/</span>                         <span class="tag tag-new">new</span>
+│   │       ├── <span class="file">AttendanceServiceImpl.java</span>
+│   │       └── <span class="file">StudentServiceImpl.java</span>
+│   │
+│   ├── <span class="dir">util/</span>                             <span class="tag tag-new">new</span>
+│   │   └── <span class="file">DateUtils.java</span>
+│   │
+│   └── <span class="file">SmartattendanceApplication.java</span>
+│
+├── <span class="dir">src/main/resources/</span>
+│   ├── <span class="dir">db/migration/</span>                   <span class="tag tag-new">new</span>  <span class="note">Flyway migrations</span>
+│   │   ├── <span class="file">V1__init_schema.sql</span>
+│   │   └── <span class="file">V2__seed_data.sql</span>
+│   ├── <span class="file">application.properties</span>          <span class="note">common / defaults</span>
+│   ├── <span class="file">application-dev.properties</span>      <span class="tag tag-new">new</span>
+│   ├── <span class="file">application-prod.properties</span>     <span class="tag tag-new">new</span>
+│   └── <span class="file">logback-spring.xml</span>             <span class="tag tag-new">new</span>
+│
+├── <span class="dir">src/test/java/.../smartattendance/</span>
+│   ├── <span class="dir">controller/</span>                       <span class="tag tag-new">new</span>
+│   │   └── <span class="file">AttendanceControllerTest.java</span>  <span class="note">MockMvc / @WebMvcTest</span>
+│   ├── <span class="dir">service/</span>                          <span class="tag tag-new">new</span>
+│   │   └── <span class="file">AttendanceServiceTest.java</span>     <span class="note">Mockito unit tests</span>
+│   ├── <span class="dir">repository/</span>                       <span class="tag tag-new">new</span>
+│   │   └── <span class="file">AttendanceRepositoryTest.java</span>  <span class="note">@DataJpaTest</span>
+│   └── <span class="file">SmartattendanceApplicationTests.java</span>
+│
+├── <span class="file">Dockerfile</span>                         <span class="note">multi-stage recommended</span>
+├── <span class="file">docker-compose.yml</span>               <span class="tag tag-new">new</span>  <span class="note">app + db + volumes</span>
+├── <span class="file">pom.xml</span>
+└── <span class="file">.env.example</span>                      <span class="tag tag-new">new</span>  <span class="note">document required env vars</span>
+
+<span class="tag tag-remove">remove</span>  <span style="font-family:var(--font-sans);font-size:12px;">Top-level <code>com/</code> folder (duplicate of src/main/java)</span>
+<span class="tag tag-remove">remove</span>  <span style="font-family:var(--font-sans);font-size:12px;">Static frontend from Spring's resources — serve separately (Nginx / CDN)</span></div>

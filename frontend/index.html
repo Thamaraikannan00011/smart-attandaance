@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>SmartAttend — Dashboard</title>
+  <link rel="manifest" href="manifest.json"/>
+  <meta name="theme-color" content="#0c0c0c"/>
+  <meta name="apple-mobile-web-app-capable" content="yes"/>
+  <meta name="apple-mobile-web-app-title" content="SmartAttend"/>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Geist:wght@300;400;500;600&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/tokens.css"/>
+  <link rel="stylesheet" href="css/layout.css"/>
+  <link rel="stylesheet" href="css/components.css"/>
+</head>
+<body>
+<div class="app-layout">
+
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-logo">
+      <div class="logo-mark">
+        <div class="logo-icon">
+          <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
+        </div>
+        <span class="logo-text">SmartAttend</span>
+      </div>
+      <div class="logo-sub">Attendance Management</div>
+    </div>
+    <nav class="sidebar-nav">
+      <div class="nav-section-label">Navigation</div>
+      <a href="index.html" class="nav-link active">
+        <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>
+        Dashboard
+      </a>
+      <a href="pages/attendance.html" class="nav-link">
+        <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
+        Mark Attendance
+      </a>
+      <a href="pages/students.html" class="nav-link">
+        <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>
+        Students
+        <span class="nav-badge">6</span>
+      </a>
+      <a href="pages/report.html" class="nav-link">
+        <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14,2 14,8 20,8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+        Reports
+      </a>
+    </nav>
+    <div class="sidebar-footer">
+      <span class="version">v1.0.0</span>
+      <span class="status-dot online"></span>
+    </div>
+  </aside>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+  <div class="main-wrap">
+    <header class="topbar">
+      <div class="topbar-left">
+        <button class="menu-toggle" id="menuToggle" aria-label="Menu">
+          <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+        </button>
+        <div class="topbar-breadcrumb">
+          <span>SmartAttend</span>
+          <span class="sep">/</span>
+          <span class="current">Dashboard</span>
+        </div>
+      </div>
+      <div class="topbar-right">
+        <span class="topbar-date" id="topbarDate"></span>
+        <a href="pages/attendance.html" class="btn btn-primary btn-sm">
+          <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          Mark Today
+        </a>
+      </div>
+    </header>
+
+    <main class="page-content">
+      <div class="page-header">
+        <div>
+          <h1 class="page-header-title" id="greeting"></h1>
+          <p class="page-header-sub" id="dashDate"></p>
+        </div>
+        <div class="page-header-actions">
+          <a href="pages/report.html" class="btn btn-secondary">
+            <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14,2 14,8 20,8"/></svg>
+            View Reports
+          </a>
+        </div>
+      </div>
+
+      <!-- Stat cards -->
+      <div class="stat-grid" id="statGrid"></div>
+
+      <!-- Row: chart + donut -->
+      <div class="dashboard-grid" style="display:grid;grid-template-columns:3fr 2fr;gap:14px;margin-bottom:14px;">
+        <div class="card">
+          <div class="card-header">
+            <div>
+              <div class="card-title">Weekly Attendance</div>
+              <div class="card-subtitle">Past 7 school days</div>
+            </div>
+            <span style="font-family:var(--font-mono);font-size:11px;color:var(--gray-300);align-self:center;" id="weekAvg"></span>
+          </div>
+          <div class="bar-chart" id="weeklyChart"></div>
+          <div style="display:flex;justify-content:space-between;margin-top:12px;padding-top:12px;border-top:1px solid var(--gray-100);">
+            <span style="font-size:11px;color:var(--gray-400);">Avg. this week</span>
+            <span style="font-size:11px;font-family:var(--font-mono);color:var(--gray-600);" id="weekAvgBottom"></span>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <div>
+              <div class="card-title">Today's Split</div>
+              <div class="card-subtitle" id="todayBreakdownDate"></div>
+            </div>
+          </div>
+          <div class="donut-wrap">
+            <div style="position:relative;flex-shrink:0;">
+              <svg width="100" height="100" viewBox="0 0 100 100">
+                <circle cx="50" cy="50" r="38" fill="none" stroke="var(--gray-100)" stroke-width="11"/>
+                <circle cx="50" cy="50" r="38" fill="none" stroke="var(--black)" stroke-width="11"
+                  stroke-dasharray="0 239" stroke-dashoffset="60" stroke-linecap="round"
+                  id="donutPresent" style="transition:stroke-dasharray 0.9s cubic-bezier(0.4,0,0.2,1)"/>
+                <circle cx="50" cy="50" r="38" fill="none" stroke="var(--gray-400)" stroke-width="11"
+                  stroke-dasharray="0 239" id="donutLate"
+                  style="transition:stroke-dasharray 0.9s cubic-bezier(0.4,0,0.2,1) 0.08s"/>
+                <text x="50" y="47" text-anchor="middle" style="font-family:var(--font-display);font-size:16px;font-weight:700;fill:var(--black);" id="donutPct"></text>
+                <text x="50" y="60" text-anchor="middle" style="font-size:8px;fill:var(--gray-400);font-family:var(--font-body);">present</text>
+              </svg>
+            </div>
+            <div class="donut-legend" id="donutLegend"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Recent table -->
+      <div class="card card-flush">
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:18px 22px 14px;">
+          <div>
+            <div class="card-title">Today's Attendance</div>
+            <div class="card-subtitle" id="recordsCount"></div>
+          </div>
+          <a href="pages/attendance.html" class="btn btn-outline btn-sm">Mark / Edit</a>
+        </div>
+        <div class="table-wrap" id="recentTable"></div>
+      </div>
+    </main>
+  </div>
+</div>
+
+<script type="module">
+const today = () => new Date().toISOString().slice(0, 10);
+const formatDateLong = (dateStr) =>
+  new Date(dateStr).toLocaleDateString(undefined, { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+const nowDisplay = () =>
+  new Date().toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric' });
+
+const MOCK_STUDENTS = [
+  { rollNo: 'SA-001', name: 'Ava Johnson',    percentage: 96 },
+  { rollNo: 'SA-002', name: 'Noah Williams',  percentage: 91 },
+  { rollNo: 'SA-003', name: 'Sophia Brown',   percentage: 88 },
+  { rollNo: 'SA-004', name: 'Liam Jones',     percentage: 93 },
+  { rollNo: 'SA-005', name: 'Mia Garcia',     percentage: 86 },
+  { rollNo: 'SA-006', name: 'Ethan Davis',    percentage: 90 },
+];
+
+const getMockSummary = () => {
+  const totalStudents = MOCK_STUDENTS.length;
+  const present = Math.max(0, totalStudents - 1);
+  const late = Math.min(1, totalStudents);
+  const absent = Math.max(0, totalStudents - present - late);
+  const percentage = Math.round((present / totalStudents) * 100);
+  return { totalStudents, present, late, absent, percentage };
+};
+
+const getMockWeeklyData = () => {
+  const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Mon', 'Tue'];
+  return days.map((day, i) => ({ day, pct: 78 + ((i * 3) % 18) }));
+};
+
+const getMockAttendance = () => {
+  const statuses = ['Present', 'Late', 'Absent'];
+  return MOCK_STUDENTS.map((s, i) => ({
+    rollNo: s.rollNo,
+    studentName: s.name,
+    status: statuses[i % statuses.length],
+    photo: '',
+  }));
+};
+
+// Greeting
+const h = new Date().getHours();
+const g = h < 12 ? 'Good morning' : h < 17 ? 'Good afternoon' : 'Good evening';
+document.getElementById('greeting').textContent = g;
+document.getElementById('topbarDate').textContent = nowDisplay();
+document.getElementById('dashDate').textContent = formatDateLong(today());
+document.getElementById('todayBreakdownDate').textContent = formatDateLong(today());
+
+const summary = getMockSummary();
+
+// Stat cards
+const stats = [
+  { label: 'Total Students', value: summary.totalStudents, change: 'Enrolled', bar: 100, accent: true },
+  { label: 'Present Today',  value: summary.present,  change: `${Math.round(summary.present/summary.totalStudents*100)}% of class`, bar: summary.present/summary.totalStudents*100 },
+  { label: 'Absent Today',   value: summary.absent,   change: `${Math.round(summary.absent/summary.totalStudents*100)}% of class`,  bar: summary.absent/summary.totalStudents*100 },
+  { label: 'Attendance %',   value: summary.percentage + '%', change: 'This semester', bar: summary.percentage },
+];
+document.getElementById('statGrid').innerHTML = stats.map(s => `
+  <div class="stat-card${s.accent?' accent-card':''}">
+    <div class="stat-label">${s.label}</div>
+    <div class="stat-value">${s.value}</div>
+    <div class="stat-change">${s.change}</div>
+    <div class="stat-bar"><div class="stat-bar-fill" style="width:0%" data-w="${s.bar}"></div></div>
+  </div>`).join('');
+setTimeout(() => document.querySelectorAll('.stat-bar-fill').forEach(el => el.style.width = el.dataset.w + '%'), 80);
+
+// Weekly chart
+const weekly = getMockWeeklyData();
+const avg = Math.round(weekly.reduce((a,w) => a + w.pct, 0) / weekly.length);
+document.getElementById('weekAvg').textContent = `avg ${avg}%`;
+document.getElementById('weekAvgBottom').textContent = `${avg}%`;
+
+document.getElementById('weeklyChart').innerHTML = weekly.map((w,i) => `
+  <div class="bar-col">
+    <div class="bar-val">${w.pct}%</div>
+    <div class="bar${i < weekly.length-1 ? ' dim':''}" style="height:0px" data-h="${Math.round(w.pct * 1.1)}px"></div>
+    <div class="bar-label">${w.day}</div>
+  </div>`).join('');
+setTimeout(() => document.querySelectorAll('.bar-col .bar').forEach(el => el.style.height = el.dataset.h), 100);
+
+// Donut
+const C = 2 * Math.PI * 38;
+const presentPct = summary.present / summary.totalStudents;
+const latePct    = summary.late    / summary.totalStudents;
+document.getElementById('donutPct').textContent = Math.round(presentPct * 100) + '%';
+setTimeout(() => {
+  const pd = C * presentPct;
+  document.getElementById('donutPresent').setAttribute('stroke-dasharray', `${pd} ${C - pd}`);
+  const ld = C * latePct;
+  document.getElementById('donutLate').setAttribute('stroke-dasharray', `${ld} ${C - ld}`);
+  document.getElementById('donutLate').setAttribute('stroke-dashoffset', -(pd) + 60 + '');
+}, 180);
+document.getElementById('donutLegend').innerHTML = `
+  <div class="donut-legend-item"><span class="donut-legend-dot" style="background:var(--black)"></span>${summary.present} Present</div>
+  <div class="donut-legend-item"><span class="donut-legend-dot" style="background:var(--gray-400)"></span>${summary.late} Late</div>
+  <div class="donut-legend-item"><span class="donut-legend-dot" style="background:var(--gray-200)"></span>${summary.absent} Absent</div>`;
+
+// Recent table
+const records = getMockAttendance();
+document.getElementById('recordsCount').textContent = `${records.length} records — ${today()}`;
+document.getElementById('recentTable').innerHTML = `
+  <table class="data-table">
+    <thead><tr>
+      <th>Student</th><th>Roll No.</th><th>Status</th><th>Attendance %</th>
+    </tr></thead>
+    <tbody>${records.map(r => {
+      const s = MOCK_STUDENTS.find(s => s.rollNo === r.rollNo) || {};
+      return `<tr>
+        <td><div class="student-cell">
+          <img class="avatar" src="${r.photo}" alt="${r.studentName}" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+          <div class="avatar" style="display:none">${r.studentName[0]}</div>
+          <div><div class="student-name">${r.studentName}</div><div class="student-roll">${r.rollNo}</div></div>
+        </div></td>
+        <td class="font-mono text-sm text-muted">${r.rollNo}</td>
+        <td><span class="badge badge-${r.status.toLowerCase()}">${r.status}</span></td>
+        <td>
+          <div class="flex items-center gap-2">
+            <div class="progress-wrap" style="width:56px;"><div class="progress-fill" style="width:${s.percentage||0}%"></div></div>
+            <span class="font-mono text-xs text-muted">${s.percentage||0}%</span>
+          </div>
+        </td>
+      </tr>`;}).join('')}
+    </tbody>
+  </table>`;
+
+// Mobile
+document.getElementById('menuToggle').addEventListener('click', () => {
+  document.getElementById('sidebar').classList.toggle('open');
+  document.getElementById('sidebarOverlay').classList.toggle('show');
+});
+document.getElementById('sidebarOverlay').addEventListener('click', () => {
+  document.getElementById('sidebar').classList.remove('open');
+  document.getElementById('sidebarOverlay').classList.remove('show');
+});
+</script>
+
+<style>
+@media (max-width: 760px) { .dashboard-grid { grid-template-columns: 1fr !important; } }
+</style>
+</body>
+</html>

@@ -1,0 +1,53 @@
+services:
+  db:
+    image: postgres:16
+    environment:
+      POSTGRES_DB: smartattendance
+      POSTGRES_USER: smartattendance
+      POSTGRES_PASSWORD: smartattendance
+    volumes:
+      - smartattendance_db:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U smartattendance -d smartattendance"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  backend:
+    build: .
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      PORT: 8080
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/smartattendance
+      SPRING_DATASOURCE_USERNAME: smartattendance
+      SPRING_DATASOURCE_PASSWORD: smartattendance
+    networks:
+      - internal
+    ports:
+      - "8080:8080"
+
+  frontend:
+    image: nginx:alpine
+    depends_on:
+      - backend
+    networks:
+      - internal
+      - public
+    ports:
+      - "3000:80"
+    volumes:
+      - ../../frontend:/usr/share/nginx/html:ro
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf:ro
+
+networks:
+  internal:
+    internal: true
+  public: {}
+
+volumes:
+  smartattendance_db:
+
